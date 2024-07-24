@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 
 # Load and preprocess the data
-data = pd.read_csv('insurance_data.csv')  # Your dataset
+data = pd.read_csv('insurance.csv')  # Your dataset
 
 # Encode categorical variables
 label_encoders = {}
