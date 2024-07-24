@@ -54,14 +54,50 @@
         .nav-link:hover {
             color: #007aff;
         }
+        .hero {
+            width: 100%;
+            background-color: #dcdee0;
+            background-size: cover;
+            background-position: center;
+            padding: 100px 20px;
+            text-align: center;
+            color: white;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        .hero button {
+            padding: 15px 30px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .hero button:hover {
+            background-color: #0051a2;
+            transform: scale(1.02);
+        }
+        .hero button:active {
+            background-color: #004080;
+        }
         .container {
             width: 100%;
             max-width: 600px;
+            min-height: 700px;
             padding: 20px;
             background: #ffffff;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 80px; /* Adjust for fixed navbar height */
+            margin-top: -50px; /* Adjust for overlap effect */
             margin-bottom: 80px; /* Adjust for fixed footer height */
         }
         h1 {
@@ -145,6 +181,63 @@
         footer a:hover {
             text-decoration: underline;
         }
+        /* Add this to your existing CSS */
+        @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #007aff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    position: absolute; /* Absolute positioning */
+    /* Customize these values for manual placement */
+    top: 950px; /* Distance from the top of the container */
+    left: 50%; /* Distance from the left of the container */
+    /* If needed, adjust the positioning to fit your layout */
+}
+#spinner {
+    display: none;
+}
+
+.input-field .material-icons {
+    position: absolute;
+    left: 10px;
+    top: 35px;
+    font-size: 24px; /* Adjust icon size if needed */
+    color: #00796b; /* Default color, will be overridden by specific colors below */
+}
+
+#age-icon {
+    color: #f44336; /* Red */
+}
+
+#sex-icon {
+    color: #2196f3; /* Blue */
+}
+
+#bmi-icon {
+    color: #4caf50; /* Green */
+}
+
+#children-icon {
+    color: #ffeb3b; /* Yellow */
+}
+
+#smoker-icon {
+    color: #ff9800; /* Orange */
+}
+
+#region-icon {
+    color: #9c27b0; /* Purple */
+}
+
+
     </style>
 </head>
 <body>
@@ -154,40 +247,46 @@
         </div>
         <div class="nav-links">
 
+
         </div>
     </nav>
+
+    <div class="hero">
+        <h1>Welcome to InsurancePredictor</h1>
+        <p style="color: rgb(45, 44, 44);">Get accurate predictions for your insurance charges</p>
+    </div>
 
     <div class="container">
         <h1>Predict Insurance Charges</h1>
         <form id="predictForm">
             <div class="input-field">
-                <label for="age"><span class="material-icons">calendar_today</span> Age:</label>
+                <label for="age"><span class="material-icons" id="age-icon">calendar_today</span> Age:</label>
                 <input type="number" id="age" name="age" required>
             </div>
             <div class="input-field">
-                <label for="sex"><span class="material-icons">wc</span> Sex:</label>
+                <label for="sex"><span class="material-icons" id="sex-icon">wc</span> Sex:</label>
                 <select id="sex" name="sex" required>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                 </select>
             </div>
             <div class="input-field">
-                <label for="bmi"><span class="material-icons">fitness_center</span> BMI:</label>
+                <label for="bmi"><span class="material-icons" id="bmi-icon">fitness_center</span> BMI:</label>
                 <input type="number" step="0.1" id="bmi" name="bmi" required>
             </div>
             <div class="input-field">
-                <label for="children"><span class="material-icons">child_care</span> Number of Children:</label>
+                <label for="children"><span class="material-icons" id="children-icon">child_care</span> Number of Children:</label>
                 <input type="number" id="children" name="children" required>
             </div>
             <div class="input-field">
-                <label for="smoker"><span class="material-icons">smoking_rooms</span> Smoker:</label>
+                <label for="smoker"><span class="material-icons" id="smoker-icon">smoking_rooms</span> Smoker:</label>
                 <select id="smoker" name="smoker" required>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                 </select>
             </div>
             <div class="input-field">
-                <label for="region"><span class="material-icons">place</span> Region:</label>
+                <label for="region"><span class="material-icons" id="region-icon">place</span> Region:</label>
                 <select id="region" name="region" required>
                     <option value="southwest">Southwest</option>
                     <option value="southeast">Southeast</option>
@@ -195,9 +294,13 @@
                     <option value="northeast">Northeast</option>
                 </select>
             </div>
+            
+
             <button type="submit">Predict</button>
-        </form>
         <div class="result" id="result"></div>
+        <div class="spinner" id="spinner" style="display: none;"></div>
+    </form>
+
     </div>
 
     <footer>
@@ -205,42 +308,58 @@
     </footer>
 
     <script>
-        document.getElementById('predictForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const formData = {
-                age: parseInt(document.getElementById('age').value),
-                sex: document.getElementById('sex').value,
-                bmi: parseFloat(document.getElementById('bmi').value),
-                children: parseInt(document.getElementById('children').value),
-                smoker: document.getElementById('smoker').value,
-                region: document.getElementById('region').value
-            };
+       document.getElementById('predictForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-            try {
-                const response = await fetch('http://localhost:5000/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+    // Hide the button and show the spinner
+    const button = event.target.querySelector('button');
+    const spinner = document.getElementById('spinner');
+    const resultDiv = document.getElementById('result');
+    
+    button.style.display = 'none';  // Hide the button
+    spinner.style.display = 'inline-block';  // Show the spinner
+    
+    // Simulate a 3-second delay for the "thinking" animation
+    setTimeout(async () => {
+        const formData = {
+            age: parseInt(document.getElementById('age').value),
+            sex: document.getElementById('sex').value,
+            bmi: parseFloat(document.getElementById('bmi').value),
+            children: parseInt(document.getElementById('children').value),
+            smoker: document.getElementById('smoker').value,
+            region: document.getElementById('region').value
+        };
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        try {
+            const response = await fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
 
-                const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                document.getElementById('result').innerText = `Predicted Charges: $${data.charges.toFixed(2)}`;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('result').innerText = `An error occurred: ${error.message}`;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            resultDiv.innerText = `Predicted Charges: $${data.charges.toFixed(2)}`;
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.innerText = `An error occurred: ${error.message}`;
+        } finally {
+            // Hide the spinner and show the button again
+            spinner.style.display = 'none';
+            button.style.display = 'block';
+        }
+    }, 3000); // 3 seconds delay
+});
+
     </script>
 </body>
 </html>
