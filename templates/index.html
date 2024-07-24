@@ -17,6 +17,11 @@
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
+            opacity: 0; /* Start with hidden body */
+            transition: opacity 1s ease-in; /* Smooth fade-in effect */
+        }
+        body.loaded {
+            opacity: 1; /* Fade-in effect when content is loaded */
         }
         nav {
             width: 100%;
@@ -30,6 +35,7 @@
             top: 0;
             left: 0;
             z-index: 1000;
+            transition: top 0.3s; /* Smooth hide/show transition */
         }
         .logo {
             font-size: 24px;
@@ -40,6 +46,7 @@
         }
         .logo .material-icons {
             margin-right: 10px; /* Adjust space between icon and text */
+            color: #007aff; /* Icon color */
         }
         .nav-links {
             display: flex;
@@ -63,6 +70,11 @@
             text-align: center;
             color: white;
             font-family: 'Times New Roman', Times, serif;
+            opacity: 0; /* Start with hidden hero section */
+            transition: opacity 1s ease-in; /* Smooth fade-in effect */
+        }
+        .hero.loaded {
+            opacity: 1; /* Fade-in effect when hero section is loaded */
         }
         .hero h1 {
             font-size: 48px;
@@ -99,6 +111,13 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-top: -50px; /* Adjust for overlap effect */
             margin-bottom: 80px; /* Adjust for fixed footer height */
+            opacity: 0; /* Start with hidden container */
+            transform: translateY(20px); /* Start position for slide-in effect */
+            transition: opacity 1s ease-in, transform 1s ease-in; /* Smooth fade-in and slide-in effect */
+        }
+        .container.show {
+            opacity: 1; /* Fade-in effect when container is loaded */
+            transform: translateY(0); /* Slide-in effect when container is loaded */
         }
         h1 {
             font-size: 30px;
@@ -119,7 +138,8 @@
             position: absolute;
             left: 10px;
             top: 35px;
-            color: #00796b; /* Use any color from Google Material Color */
+            font-size: 24px; /* Adjust icon size if needed */
+            color: #007aff; /* Icon color */
         }
         .input-field input, .input-field select {
             width: 100%;
@@ -181,31 +201,59 @@
         footer a:hover {
             text-decoration: underline;
         }
-        /* Add this to your existing CSS */
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+                border: 4px solid rgba(0, 0, 0, 0.1);
+                border-left: 4px solid #007aff;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
+                position: absolute; /* Absolute positioning */
+                /* Customize these values for manual placement */
+                top: 670px; /* Distance from the top of the container */
+                left: 50%; /* Distance from the left of the container */
+                /* If needed, adjust the positioning to fit your layout */
+            }
+            #spinner {
+                display: none;
+            }
         @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #loading-overlay .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #007aff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
 
-.spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #007aff;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    position: absolute; /* Absolute positioning */
-    /* Customize these values for manual placement */
-    top: 950px; /* Distance from the top of the container */
-    left: 50%; /* Distance from the left of the container */
-    /* If needed, adjust the positioning to fit your layout */
-}
-#spinner {
-    display: none;
-}
-
-.input-field .material-icons {
+        .input-field .material-icons {
     position: absolute;
     left: 10px;
     top: 35px;
@@ -237,17 +285,17 @@
     color: #9c27b0; /* Purple */
 }
 
-
     </style>
 </head>
 <body>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
     <nav>
         <div class="logo">
             <span class="material-icons">shield</span> InsurancePredictor
         </div>
         <div class="nav-links">
-
-
         </div>
     </nav>
 
@@ -257,7 +305,7 @@
     </div>
 
     <div class="container">
-        <h1>Predict Insurance Charges</h1>
+        <h1>Insurance Charge Prediction</h1>
         <form id="predictForm">
             <div class="input-field">
                 <label for="age"><span class="material-icons" id="age-icon">calendar_today</span> Age:</label>
@@ -295,71 +343,82 @@
                 </select>
             </div>
             
-
-            <button type="submit">Predict</button>
-        <div class="result" id="result"></div>
-        <div class="spinner" id="spinner" style="display: none;"></div>
-    </form>
-
+            <button type="submit">Predict Charges</button>
+            <div id="spinner" class="spinner"></div>
+        </form>
+        <div id="result" class="result"></div>
     </div>
 
     <footer>
-        <p>&copy; 2024 InsurancePredictor | <a href="mailto:support@insurancepredictor.com">Contact Us</a></p>
+        <p>© 2024 InsurancePredictor. All rights reserved.</p>
     </footer>
 
     <script>
-       document.getElementById('predictForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
+        window.addEventListener('load', function() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const content = document.querySelector('.container');
+            const hero = document.querySelector('.hero');
 
-    // Hide the button and show the spinner
-    const button = event.target.querySelector('button');
-    const spinner = document.getElementById('spinner');
-    const resultDiv = document.getElementById('result');
-    
-    button.style.display = 'none';  // Hide the button
-    spinner.style.display = 'inline-block';  // Show the spinner
-    
-    // Simulate a 3-second delay for the "thinking" animation
-    setTimeout(async () => {
-        const formData = {
-            age: parseInt(document.getElementById('age').value),
-            sex: document.getElementById('sex').value,
-            bmi: parseFloat(document.getElementById('bmi').value),
-            children: parseInt(document.getElementById('children').value),
-            smoker: document.getElementById('smoker').value,
-            region: document.getElementById('region').value
-        };
+            // Hide the loading overlay and show the content with animation
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                content.classList.add('show');
+                hero.classList.add('loaded');
+                document.body.classList.add('loaded');
+            }, 500);
+        });
 
-        try {
-            const response = await fetch('http://localhost:5000/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+        document.getElementById('predictForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            // Hide the button and show the spinner
+            const button = event.target.querySelector('button');
+            const spinner = document.getElementById('spinner');
+            const resultDiv = document.getElementById('result');
+            
+            button.style.display = 'none';  // Hide the button
+            spinner.style.display = 'inline-block';  // Show the spinner
+            
+            // Simulate a 3-second delay for the "thinking" animation
+            setTimeout(async () => {
+                const formData = {
+                    age: parseInt(document.getElementById('age').value),
+                    sex: document.getElementById('sex').value,
+                    bmi: parseFloat(document.getElementById('bmi').value),
+                    children: parseInt(document.getElementById('children').value),
+                    smoker: document.getElementById('smoker').value,
+                    region: document.getElementById('region').value
+                };
 
-            const data = await response.json();
-            if (data.error) {
-                throw new Error(data.error);
-            }
+                try {
+                    const response = await fetch('http://localhost:5000/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
 
-            resultDiv.innerText = `Predicted Charges: $${data.charges.toFixed(2)}`;
-        } catch (error) {
-            console.error('Error:', error);
-            resultDiv.innerText = `An error occurred: ${error.message}`;
-        } finally {
-            // Hide the spinner and show the button again
-            spinner.style.display = 'none';
-            button.style.display = 'block';
-        }
-    }, 3000); // 3 seconds delay
-});
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
+                    const data = await response.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    resultDiv.innerText = `Predicted Charges: $${data.charges.toFixed(2)}`;
+                } catch (error) {
+                    console.error('Error:', error);
+                    resultDiv.innerText = `An error occurred: ${error.message}`;
+                } finally {
+                    // Hide the spinner and show the button again
+                    spinner.style.display = 'none';
+                    button.style.display = 'block';
+                }
+            }, 3000); // 3 seconds delay
+        });
     </script>
 </body>
 </html>
